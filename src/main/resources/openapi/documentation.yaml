@@ -1,0 +1,937 @@
+openapi: "3.0.3"
+info:
+  title: "Library Management API"
+  description: "A comprehensive library management system with book, category, and customer management"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8080"
+    description: "Local development server"
+paths:
+  /:
+    get:
+      operationId: "getWelcomeMessage"
+      tags:
+        - "General"
+      summary: "Welcome message"
+      description: "Returns a welcome message for the Library Management API"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              example: "Library Management API"
+  
+  /books:
+    get:
+      operationId: "getAllBooks"
+      tags:
+        - "Books"
+      summary: "Get all books"
+      description: "Retrieve a list of all books in the library"
+      responses:
+        "200":
+          description: "List of books retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Book"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: "createBook"
+      tags:
+        - "Books"
+      summary: "Create a new book"
+      description: "Add a new book to the library (requires authentication)"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookCreate"
+      responses:
+        "201":
+          description: "Book created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /books/{id}:
+    get:
+      operationId: "getBookById"
+      tags:
+        - "Books"
+      summary: "Get book by ID"
+      description: "Retrieve a specific book by its ID"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Book ID"
+      responses:
+        "200":
+          description: "Book retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Book not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: "updateBook"
+      tags:
+        - "Books"
+      summary: "Update book"
+      description: "Update an existing book (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Book ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookUpdate"
+      responses:
+        "200":
+          description: "Book updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Book not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: "deleteBook"
+      tags:
+        - "Books"
+      summary: "Delete book"
+      description: "Delete a book from the library (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Book ID"
+      responses:
+        "204":
+          description: "Book deleted successfully"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Book not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /categories:
+    get:
+      operationId: "getAllCategories"
+      tags:
+        - "Categories"
+      summary: "Get all categories"
+      description: "Retrieve a list of all book categories"
+      responses:
+        "200":
+          description: "List of categories retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Category"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: "createCategory"
+      tags:
+        - "Categories"
+      summary: "Create a new category"
+      description: "Add a new book category (requires authentication)"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreate"
+      responses:
+        "201":
+          description: "Category created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /categories/{id}:
+    get:
+      operationId: "getCategoryById"
+      tags:
+        - "Categories"
+      summary: "Get category by ID"
+      description: "Retrieve a specific category by its ID"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Category ID"
+      responses:
+        "200":
+          description: "Category retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Category not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: "updateCategory"
+      tags:
+        - "Categories"
+      summary: "Update category"
+      description: "Update an existing category (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Category ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdate"
+      responses:
+        "200":
+          description: "Category updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Category not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: "deleteCategory"
+      tags:
+        - "Categories"
+      summary: "Delete category"
+      description: "Delete a category (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Category ID"
+      responses:
+        "204":
+          description: "Category deleted successfully"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Category not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /customers:
+    post:
+      operationId: "registerCustomer"
+      tags:
+        - "Customers"
+      summary: "Register new customer"
+      description: "Register a new customer account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerCreate"
+      responses:
+        "201":
+          description: "Customer registered successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Customer already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: "getAllCustomers"
+      tags:
+        - "Customers"
+      summary: "Get all customers"
+      description: "Retrieve a list of all customers (requires authentication)"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "List of customers retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/CustomerResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /customers/{id}:
+    get:
+      operationId: "getCustomerById"
+      tags:
+        - "Customers"
+      summary: "Get customer by ID"
+      description: "Retrieve a specific customer by ID (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Customer ID"
+      responses:
+        "200":
+          description: "Customer retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Customer not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: "updateCustomer"
+      tags:
+        - "Customers"
+      summary: "Update customer"
+      description: "Update customer information (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Customer ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerUpdate"
+      responses:
+        "200":
+          description: "Customer updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Customer not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: "deleteCustomer"
+      tags:
+        - "Customers"
+      summary: "Delete customer"
+      description: "Delete a customer account (requires authentication)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Customer ID"
+      responses:
+        "204":
+          description: "Customer deleted successfully"
+        "400":
+          description: "Invalid ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Customer not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
+  /login:
+    post:
+      operationId: "loginCustomer"
+      tags:
+        - "Authentication"
+      summary: "Customer login"
+      description: "Authenticate a customer and receive a JWT token"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Book:
+      type: "object"
+      required:
+        - "title"
+        - "author"
+        - "publisher"
+        - "publishingYear"
+        - "categoryId"
+      properties:
+        id:
+          type: "integer"
+          description: "Book ID"
+          example: 1
+        title:
+          type: "string"
+          description: "Book title"
+          example: "The Great Gatsby"
+        author:
+          type: "string"
+          description: "Book author"
+          example: "F. Scott Fitzgerald"
+        publisher:
+          type: "string"
+          description: "Book publisher"
+          example: "Scribner"
+        publishingYear:
+          type: "integer"
+          description: "Year of publication"
+          example: 1925
+        categoryId:
+          type: "integer"
+          description: "Category ID"
+          example: 1
+        categoryName:
+          type: "string"
+          description: "Category name"
+          example: "Fiction"
+    
+    BookCreate:
+      type: "object"
+      required:
+        - "title"
+        - "author"
+        - "publisher"
+        - "publishingYear"
+        - "categoryId"
+      properties:
+        title:
+          type: "string"
+          description: "Book title"
+          example: "The Great Gatsby"
+        author:
+          type: "string"
+          description: "Book author"
+          example: "F. Scott Fitzgerald"
+        publisher:
+          type: "string"
+          description: "Book publisher"
+          example: "Scribner"
+        publishingYear:
+          type: "integer"
+          description: "Year of publication"
+          example: 1925
+        categoryId:
+          type: "integer"
+          description: "Category ID"
+          example: 1
+    
+    BookUpdate:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+          description: "Book title"
+          example: "The Great Gatsby"
+        author:
+          type: "string"
+          description: "Book author"
+          example: "F. Scott Fitzgerald"
+        publisher:
+          type: "string"
+          description: "Book publisher"
+          example: "Scribner"
+        publishingYear:
+          type: "integer"
+          description: "Year of publication"
+          example: 1925
+        categoryId:
+          type: "integer"
+          description: "Category ID"
+          example: 1
+    
+    Category:
+      type: "object"
+      required:
+        - "name"
+        - "description"
+      properties:
+        id:
+          type: "integer"
+          description: "Category ID"
+          example: 1
+        name:
+          type: "string"
+          description: "Category name"
+          example: "Fiction"
+        description:
+          type: "string"
+          description: "Category description"
+          example: "Fictional literature and novels"
+        bookCount:
+          type: "integer"
+          description: "Number of books in this category"
+          example: 25
+          default: 0
+    
+    CategoryCreate:
+      type: "object"
+      required:
+        - "name"
+        - "description"
+      properties:
+        name:
+          type: "string"
+          description: "Category name"
+          example: "Fiction"
+        description:
+          type: "string"
+          description: "Category description"
+          example: "Fictional literature and novels"
+    
+    CategoryUpdate:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Category name"
+          example: "Fiction"
+        description:
+          type: "string"
+          description: "Category description"
+          example: "Fictional literature and novels"
+    
+    Customer:
+      type: "object"
+      required:
+        - "id"
+        - "name"
+        - "email"
+      properties:
+        id:
+          type: "integer"
+          description: "Customer ID"
+          example: 1
+        name:
+          type: "string"
+          description: "Customer name"
+          example: "John Doe"
+        email:
+          type: "string"
+          format: "email"
+          description: "Customer email"
+          example: "john.doe@example.com"
+    
+    CustomerResponse:
+      type: "object"
+      required:
+        - "id"
+        - "name"
+        - "email"
+      properties:
+        id:
+          type: "integer"
+          description: "Customer ID"
+          example: 1
+        name:
+          type: "string"
+          description: "Customer name"
+          example: "John Doe"
+        email:
+          type: "string"
+          format: "email"
+          description: "Customer email"
+          example: "john.doe@example.com"
+    
+    CustomerCreate:
+      type: "object"
+      required:
+        - "name"
+        - "email"
+        - "password"
+      properties:
+        name:
+          type: "string"
+          description: "Customer name"
+          example: "John Doe"
+        email:
+          type: "string"
+          format: "email"
+          description: "Customer email"
+          example: "john.doe@example.com"
+        password:
+          type: "string"
+          format: "password"
+          description: "Customer password"
+          example: "securepassword123"
+    
+    CustomerUpdate:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Customer name"
+          example: "John Doe"
+        email:
+          type: "string"
+          format: "email"
+          description: "Customer email"
+          example: "john.doe@example.com"
+        password:
+          type: "string"
+          format: "password"
+          description: "Customer password"
+          example: "securepassword123"
+    
+    LoginRequest:
+      type: "object"
+      required:
+        - "email"
+        - "password"
+      properties:
+        email:
+          type: "string"
+          format: "email"
+          description: "Customer email"
+          example: "john.doe@example.com"
+        password:
+          type: "string"
+          format: "password"
+          description: "Customer password"
+          example: "securepassword123"
+    
+    LoginResponse:
+      type: "object"
+      required:
+        - "token"
+        - "customer"
+      properties:
+        token:
+          type: "string"
+          description: "JWT authentication token"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        customer:
+          $ref: "#/components/schemas/CustomerResponse"
+    
+    ErrorResponse:
+      type: "object"
+      required:
+        - "error"
+        - "message"
+      properties:
+        error:
+          type: "string"
+          description: "Error code"
+          example: "validation_error"
+        message:
+          type: "string"
+          description: "Error message"
+          example: "Validation failed"

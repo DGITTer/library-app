@@ -1,0 +1,19 @@
+ktor:
+    development: true
+    application:
+        modules:
+            - com.example.ApplicationKt.module
+    deployment:
+        port: 8080
+postgres:
+  url: "jdbc:postgresql://localhost/default"
+  user: postgres
+  password: postgres
+  domain: "http://localhost:8080/"
+  audience: "jwt-audience"
+  realm: "library-app"
+jwt:
+    audience: "jwt-audience"
+    domain: "http://localhost:8080/"
+    realm: "library-app"
+    secret: "secret"
